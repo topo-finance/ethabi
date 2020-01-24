@@ -74,8 +74,7 @@ impl<'a> Visitor<'a> for TupleParamVisitor {
 			}
 		}
 
-		let kind = kind.ok_or_else(|| Error::missing_field("kind")).and_then(|param_type| {
-			 match param_type {
+		let kind = kind.ok_or_else(|| Error::missing_field("kind")).and_then(|param_type| match param_type {
 				ParamType::Tuple(_) => {
 					let tuple_params = components.ok_or_else(|| Error::missing_field("components"))?;
 					Ok(ParamType::Tuple(tuple_params.into_iter().map(|param| param.kind).map(Box::new).collect()))
