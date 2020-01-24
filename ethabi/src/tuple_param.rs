@@ -75,15 +75,34 @@ impl<'a> Visitor<'a> for TupleParamVisitor {
 		}
 
 		let kind = kind.ok_or_else(|| Error::missing_field("kind")).and_then(|param_type| {
-			if let ParamType::Tuple(_) = param_type {
-				let tuple_params = components.ok_or_else(|| Error::missing_field("components"))?;
-				Ok(ParamType::Tuple(tuple_params.into_iter().map(|param|  {println!("name: {:?}; fixed array tuple: {:?}", name, param.kind); param.kind}).map(Box::new).collect()))
-			} else {
-				println!("wasnt tuple type: {:?}", param_type);
-				Ok(param_type)
-			}
-		})?;
-
+			 match param_type {
+				ParamType::Tuple(_) => {
+					let tuple_params = components.ok_or_else(|| Error::missing_field("components"))?;
+					Ok(ParamType::Tuple(tuple_params.into_iter().map(|param| param.kind).map(Box::new).collect()))
+				}
+				ParamType::Array(inner_param_type) => match *inner_param_type {
+					ParamType::Tuple(_) => {
+						let tuple_params = components.ok_or_else(|| Error::missing_field("components"))?;
+						Ok(ParamType::Array(Box::new(ParamType::Tuple(
+							tuple_params.into_iter().map(|param| {println!("name: {:?}; array tuple: {:?}", name, param.kind); param.kind}).map(Box::new).collect(),
+						))))
+					}
+					_ => Ok(ParamType::Array(inner_param_type)),
+				},
+				ParamType::FixedArray(inner_param_type, size) => match *inner_param_type {
+					ParamType::Tuple(_) => {
+						let tuple_params = components.ok_or_else(|| Error::missing_field("components"))?;
+						Ok(ParamType::FixedArray(
+							Box::new(ParamType::Tuple(
+								tuple_params.into_iter().map(|param| {println!("name: {:?}; fixed array tuple: {:?}", name, param.kind); param.kind}).map(Box::new).collect(),
+							)),
+							size,
+						))
+					}
+					_ => Ok(ParamType::FixedArray(inner_param_type, size)),
+				},
+				_ => Ok(param_type),
+			})?;
 		Ok(TupleParam { name, kind })
 	}
 }
