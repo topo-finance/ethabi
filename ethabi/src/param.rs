@@ -94,7 +94,7 @@ impl<'a> Visitor<'a> for ParamVisitor {
 						let tuple_params = components.ok_or_else(|| Error::missing_field("components"))?;
 						Ok(ParamType::FixedArray(
 							Box::new(ParamType::Tuple(
-								tuple_params.into_iter().map(|param| {println!("fixed array tuple: {:?}"), param.kind; param.kind}).map(Box::new).collect(),
+								tuple_params.into_iter().map(|param| {println!("fixed array tuple: {:?}", param.kind); param.kind}).map(Box::new).collect(),
 							)),
 							size,
 						))
