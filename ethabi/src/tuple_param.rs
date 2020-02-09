@@ -83,7 +83,7 @@ impl<'a> Visitor<'a> for TupleParamVisitor {
 					ParamType::Tuple(_) => {
 						let tuple_params = components.ok_or_else(|| Error::missing_field("components"))?;
 						Ok(ParamType::Array(Box::new(ParamType::Tuple(
-							tuple_params.into_iter().map(|param| {println!("name: {:?}; array tuple: {:?}", name, param.kind); param.kind}).map(Box::new).collect(),
+							tuple_params.into_iter().map(|param| param.kind).map(Box::new).collect(),
 						))))
 					}
 					_ => Ok(ParamType::Array(inner_param_type)),
@@ -93,7 +93,7 @@ impl<'a> Visitor<'a> for TupleParamVisitor {
 						let tuple_params = components.ok_or_else(|| Error::missing_field("components"))?;
 						Ok(ParamType::FixedArray(
 							Box::new(ParamType::Tuple(
-								tuple_params.into_iter().map(|param| {println!("name: {:?}; fixed array tuple: {:?}", name, param.kind); param.kind}).map(Box::new).collect(),
+								tuple_params.into_iter().map(|param| param.kind).map(Box::new).collect(),
 							)),
 							size,
 						))
